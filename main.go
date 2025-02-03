@@ -154,45 +154,53 @@ func (w Walking) TrainingInfo() InfoMessage {
 	return w.Training.TrainingInfo()
 }
 
-// // Константы для расчета потраченных килокалорий при плавании.
-// const (
-// 	SwimmingLenStep                  = 1.38 // длина одного гребка
-// 	SwimmingCaloriesMeanSpeedShift   = 1.1  // коэффициент изменения средней скорости
-// 	SwimmingCaloriesWeightMultiplier = 2    // множитель веса пользователя
-// )
+// Константы для расчета потраченных килокалорий при плавании.
+const (
+	SwimmingLenStep                  = 1.38 // длина одного гребка
+	SwimmingCaloriesMeanSpeedShift   = 1.1  // коэффициент изменения средней скорости
+	SwimmingCaloriesWeightMultiplier = 2    // множитель веса пользователя
+)
 
-// // Swimming структура, описывающая тренировку Плавание
-// type Swimming struct {
-// 	// добавьте необходимые поля в структуру
-// 	...
-// 	... // длина бассейна
-// 	... // количество пересечений бассейна
-// }
+// Swimming структура, описывающая тренировку Плавание
+type Swimming struct {
+	// добавьте необходимые поля в структуру
+	Training
+	LengthPool int // длина бассейна
+	CountPool  int // количество пересечений бассейна
+}
 
-// // meanSpeed возвращает среднюю скорость при плавании.
-// // Формула расчета:
-// // длина_бассейна * количество_пересечений / м_в_км / продолжительность_тренировки
-// // Это переопределенный метод Calories() из Training.
-// func (s Swimming) meanSpeed() float64 {
-// 	// вставьте ваш код ниже
-// 	...
-// }
+// meanSpeed возвращает среднюю скорость при плавании.
+// Формула расчета:
+// длина_бассейна * количество_пересечений / м_в_км / продолжительность_тренировки
+// Это переопределенный метод Calories() из Training.
+func (s Swimming) meanSpeed() float64 {
+	// вставьте ваш код ниже
+	speed := float64(s.LengthPool*s.CountPool) / MInKm / s.Training.Duration.Hours()
+	return speed
+}
 
-// // Calories возвращает количество калорий, потраченных при плавании.
-// // Формула расчета:
-// // (средняя_скорость_в_км/ч + SwimmingCaloriesMeanSpeedShift) * SwimmingCaloriesWeightMultiplier * вес_спортсмена_в_кг * время_тренировки_в_часах
-// // Это переопределенный метод Calories() из Training.
-// func (s Swimming) Calories() float64 {
-// 	// вставьте ваш код ниже
-// 	...
-// }
+// Calories возвращает количество калорий, потраченных при плавании.
+// Формула расчета:
+// (средняя_скорость_в_км/ч + SwimmingCaloriesMeanSpeedShift) * SwimmingCaloriesWeightMultiplier * вес_спортсмена_в_кг * время_тренировки_в_часах
+// Это переопределенный метод Calories() из Training.
+func (s Swimming) Calories() float64 {
+	// вставьте ваш код ниже
+	calories := (s.meanSpeed() + SwimmingCaloriesMeanSpeedShift) * SwimmingCaloriesWeightMultiplier * s.Training.Weight * s.Training.Duration.Hours()
+	return calories
+}
 
-// // TrainingInfo returns info about swimming training.
-// // Это переопределенный метод TrainingInfo() из Training.
-// func (s Swimming) TrainingInfo() InfoMessage {
-// 	// вставьте ваш код ниже
-// 	...
-// }
+// TrainingInfo returns info about swimming training.
+// Это переопределенный метод TrainingInfo() из Training.
+func (s Swimming) TrainingInfo() InfoMessage {
+	// вставьте ваш код ниже
+	distance := float64(s.LengthPool*s.CountPool) / MInKm
+	return InfoMessage{
+		TrainingType: s.Training.TrainingType,
+		Duration:     s.Training.Duration,
+		Distance:     distance,
+		Speed:        s.meanSpeed(),
+	}
+}
 
 // ReadData возвращает информацию о проведенной тренировке.
 func ReadData(training CaloriesCalculator) string {
@@ -209,19 +217,19 @@ func ReadData(training CaloriesCalculator) string {
 
 func main() {
 
-	// swimming := Swimming{
-	// 	Training: Training{
-	// 		TrainingType: "Плавание",
-	// 		Action:       2000,
-	// 		LenStep:      SwimmingLenStep,
-	// 		Duration:     90 * time.Minute,
-	// 		Weight:       85,
-	// 	},
-	// 	LengthPool: 50,
-	// 	CountPool:  5,
-	// }
+	swimming := Swimming{
+		Training: Training{
+			TrainingType: "Плавание",
+			Action:       2000,
+			LenStep:      SwimmingLenStep,
+			Duration:     90 * time.Minute,
+			Weight:       85,
+		},
+		LengthPool: 50,
+		CountPool:  5,
+	}
 
-	// fmt.Println(ReadData(swimming))
+	fmt.Println(ReadData(swimming))
 
 	walking := Walking{
 		Training: Training{
